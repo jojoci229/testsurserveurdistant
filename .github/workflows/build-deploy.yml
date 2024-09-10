@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Replace variables in docker-compose.yml
         run: |
-    sed -i 's#${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}#'"${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}"'#g' docker-compose.yml
+         sed -i 's#${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}#'"${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}"'#g' docker-compose.yml
 
 
       - name: Transfer docker-compose.yml to remote server
