@@ -1,0 +1,19 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend  # Utilise le répertoire "frontend" comme contexte de construction
+    ports:
+      - "5001:5001"
+    container_name: frontend_app
+    depends_on:
+      - backend
+    restart: always  # Redémarre toujours le service en cas de problème
+
+  backend:
+    build:
+      context: ./backend  # Utilise le répertoire "backend" comme contexte de construction
+    ports:
+      - "5000:5000"
+    container_name: backend_app
+    restart: always  # Redémarre toujours le service en cas de problème

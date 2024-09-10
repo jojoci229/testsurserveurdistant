@@ -1,0 +1,69 @@
+name: CI and Deployment Pipeline
+
+# Déclenchement du workflow à chaque push sur la branche "main"
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # Premier job: Construction des images Docker pour frontend et backend
+  build:
+    runs-on: ubuntu-latest  # Utilise une machine virtuelle Ubuntu
+    steps:
+      # Étape 1: Récupérer le code du repository GitHub
+      - uses: actions/checkout@v4
+
+      # Étape 2: Connexion au registre de conteneurs Scaleway pour envoyer les images Docker
+      - name: Login to Scaleway Container Registry
+        uses: docker/login-action@v3
+        with:
+          username: nologin
+          password: ${{ secrets.SCALEWAY_API_KEY }}  # Utilise la clé API stockée en secret
+          registry: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}
+
+      # Étape 3: Construction et push de l'image Docker du service frontend
+      - name: Build frontend Docker image
+        run: docker build ./frontend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
+      
+      - name: Push frontend Docker image
+        run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
+
+      # Étape 4: Construction et push de l'image Docker du service backend
+      - name: Build backend Docker image
+        run: docker build ./backend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
+
+      - name: Push backend Docker image
+        run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
+
+  # Deuxième job: Déploiement des services sur le serveur distant
+  deploy:
+    runs-on: ubuntu-latest  # Machine virtuelle Ubuntu
+    needs: build  # Ce job dépend du job "build" (attend que les images soient construites et poussées)
+    steps:
+      # Étape 1: Transfert du fichier docker-compose.yml vers le répertoire "jaures" sur le bureau Ubuntu
+      - name: Transfer docker-compose.yml to remote server
+        uses: appleboy/scp-action@v0.1.0  # Utilise l'action SCP pour transférer des fichiers via SSH
+        with:
+          host: ${{ secrets.DEPLOYMENT_SERVER_IP }}  # Adresse IP du serveur distant
+          username: ${{ secrets.DEPLOYMENT_USER }}  # Nom d'utilisateur pour se connecter au serveur
+          key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH privée pour l'authentification
+          source: ./docker-compose.yml  # Chemin du fichier local docker-compose.yml
+          target: /home/${{ secrets.DEPLOYMENT_USER }}/root/Jaures/docker-compose.yml  # Chemin sur le serveur (dans le répertoire "jaures" sur le bureau)
+
+      # Étape 2: Connexion au serveur distant et déploiement des services avec Docker Compose
+      - name: Deploy to remote server
+        uses: appleboy/ssh-action@v0.1.6  # Utilise l'action SSH pour exécuter des commandes sur le serveur distant
+        with:
+          host: ${{ secrets.DEPLOYMENT_SERVER_IP }}  # Adresse IP du serveur distant
+          username: ${{ secrets.DEPLOYMENT_USER }}  # Nom d'utilisateur pour se connecter au serveur
+          key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH privée pour l'authentification
+          script: |
+            echo "Déploiement des images Docker sur le serveur distant..."
+            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest  # Récupère la dernière image frontend depuis le registre
+            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest  # Récupère la dernière image backend depuis le registre
+            
+            # Arrête et supprime les anciens conteneurs s'ils existent
+            docker-compose -f /home/${{ secrets.DEPLOYMENT_USER }}/root/Jaures/docker-compose.yml down || true
+
+            # Redémarre les services avec les nouvelles images
+            docker-compose -f /home/${{ secrets.DEPLOYMENT_USER }}/root/Jaures/docker-compose.yml up -d
