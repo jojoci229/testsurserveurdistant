@@ -19,13 +19,15 @@ jobs:
           registry: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}
 
       - name: Build frontend Docker image
-        run: docker build ./frontend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
+        run: docker build /home/Jaures -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
+
 
       - name: Push frontend Docker image
         run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
 
       - name: Build backend Docker image
-        run: docker build ./backend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
+        run: docker build /home/Jaures -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
+
 
       - name: Push backend Docker image
         run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
