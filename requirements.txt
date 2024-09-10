@@ -1,0 +1,10 @@
+apache-airflow==2.10.1
+pendulum==3.0.0
+requests==2.32.3
+minio==7.2.8
+streamlit==1.37.1
+crewai==0.51.1
+crewai_tools==0.8.3
+langchain_community==0.2.12
+langchain_groq==0.1.9
+langchain==0.2.14

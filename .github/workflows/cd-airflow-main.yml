@@ -1,0 +1,45 @@
+name: CI/CD for Airflow on Scaleway
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Permet de déclencher manuellement le workflow
+
+jobs:
+  build:
+    name: Build and Deploy to Scaleway
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1 : Cloner le repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Étape 2 : Configurer l'accès SSH pour Scaleway
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SCALEWAY_SSH_PRIVATE_KEY }}
+
+      # Étape 3 : Déployer les fichiers sur le serveur distant via SSH
+      - name: Copy project files to Scaleway
+        run: |
+          rsync -avz -e "ssh -p ${{ secrets.SCALEWAY_SSH_PORT }}" --exclude='.git' --exclude='.github' ./ ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }}:/opt/airflow_project/
+
+      # Étape 4 : Exécuter Docker Compose sur le serveur distant
+      - name: Run Docker Compose on Scaleway
+        run: |
+          ssh -p ${{ secrets.SCALEWAY_SSH_PORT }} ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} << 'EOF'
+            cd /opt/airflow_project/
+            docker-compose down
+            docker-compose up -d --build
+          EOF
+
+      # Étape 5 : Vérifier l'état des conteneurs
+      - name: Check Airflow services status
+        run: |
+          ssh -p ${{ secrets.SCALEWAY_SSH_PORT }} ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} << 'EOF'
+            docker ps --filter "name=airflow"
+          EOF
+
