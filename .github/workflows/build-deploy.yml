@@ -41,7 +41,7 @@ jobs:
     steps:
       # Étape 1: Transférer le fichier docker-compose.yml vers le serveur distant
       - name: Transfer docker-compose.yml to remote server
-        uses: appleboy/scp-action@v0.1.0  # Utilise l'action SCP pour transférer des fichiers via SSH
+        uses: appleboy/scp-action@v0.1.7  # Utilise l'action SCP pour transférer des fichiers via SSH
         with:
           host: ${{ secrets.DEPLOYMENT_SERVER_IP }}  # Adresse IP du serveur distant
           username: ${{ secrets.DEPLOYMENT_USER }}  # Nom d'utilisateur du serveur
