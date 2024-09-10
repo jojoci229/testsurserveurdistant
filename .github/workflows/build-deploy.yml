@@ -41,10 +41,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Replace variables in docker-compose.yml
-        run: |
-         sed -i 's#${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}#'"${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}"'#g' docker-compose.yml
-
 
       - name: Transfer docker-compose.yml to remote server
         uses: appleboy/scp-action@v0.1.4
@@ -62,8 +58,9 @@ jobs:
           username: ${{ secrets.DEPLOYMENT_USER }}
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
           script: |
-            echo "Pulling images and deploying services..."
+            export FRONTEND_IMAGE="${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest"
+            export BACKEND_IMAGE="${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest"
             cd /home/Jaures
-            docker-compose pull  # Télécharge les dernières images Docker du registre
-            docker-compose down || true  # Arrête les anciens conteneurs s'ils existent
-            docker-compose up -d  # Démarre les nouveaux conteneurs en arrière-plan
+            docker-compose pull
+            docker-compose down || true
+            docker-compose up -d
