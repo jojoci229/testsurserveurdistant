@@ -54,6 +54,7 @@ jobs:
           username: ${{ secrets.DEPLOYMENT_USER }}
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
           script: |
+            cd /home/Jaures
             echo "Déploiement des services sur le serveur distant..."
             docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
             docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
