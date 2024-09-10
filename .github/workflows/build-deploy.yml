@@ -23,17 +23,17 @@ jobs:
 
       # Étape 3: Construction et push de l'image Docker du service frontend
       - name: Build frontend Docker image
-        run: docker build ./frontend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/projettest/frontend:latest
+        run: docker build ./frontend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
       
       - name: Push frontend Docker image
-        run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/projettest/frontend:latest
+        run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
 
       # Étape 4: Construction et push de l'image Docker du service backend
       - name: Build backend Docker image
-        run: docker build ./backend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/projettest/backend:latest
+        run: docker build ./backend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
 
       - name: Push backend Docker image
-        run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/projettest/backend:latest
+        run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
 
   # Deuxième job: Déploiement des services sur le serveur distant
   deploy:
@@ -59,8 +59,8 @@ jobs:
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH privée pour l'authentification
           script: |
             echo "Déploiement des images Docker sur le serveur distant..."
-            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/projettest/frontend:latest  # Récupère la dernière image frontend depuis le registre
-            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/projettest/backend:latest  # Récupère la dernière image backend depuis le registre
+            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest  # Récupère la dernière image frontend depuis le registre
+            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest  # Récupère la dernière image backend depuis le registre
             
             # Arrête et supprime les anciens conteneurs s'ils existent
             docker-compose -f /home/${{ secrets.DEPLOYMENT_USER }}/root/Jaures/docker-compose.yml down || true
