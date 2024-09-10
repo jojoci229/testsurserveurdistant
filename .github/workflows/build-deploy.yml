@@ -42,7 +42,7 @@ jobs:
           username: ${{ secrets.DEPLOYMENT_USER }}
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
           source: ./docker-compose.yml  # Spécifie le fichier à la racine du dépôt
-          target: ~/jaures/docker-compose.yml  # Transfert vers le répertoire "jaures" sur le serveur distant
+          target: ~/Jaures/docker-compose.yml  # Transfert vers le répertoire "jaures" sur le serveur distant
 
       - name: Deploy to remote server
         uses: appleboy/ssh-action@v0.1.6
@@ -56,5 +56,5 @@ jobs:
             docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
             
             # Arrête les anciens conteneurs et redémarre avec les nouvelles images
-            docker-compose -f ~/jaures/docker-compose.yml down || true
-            docker-compose -f ~/jaures/docker-compose.yml up -d
+            docker-compose -f ~/Jaures/docker-compose.yml down || true
+            docker-compose -f ~/Jaures/docker-compose.yml up -d
