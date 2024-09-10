@@ -36,7 +36,7 @@ jobs:
     needs: build
     steps:
       - name: Transfer docker-compose.yml to remote server
-        uses: appleboy/scp-action@v0.1.4
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOYMENT_SERVER_IP }}
           username: ${{ secrets.DEPLOYMENT_USER }}
