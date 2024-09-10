@@ -48,6 +48,7 @@ jobs:
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH privée pour l'authentification
           source: './docker-compose.yml'
           target: '/home/Jaures'
+          debug: true
 
       # Étape 2: Connexion et déploiement avec Docker Compose
       - name: Deploy to remote server
