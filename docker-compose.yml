@@ -1,15 +1,15 @@
-version: '3'
+version: "3"
 services:
   frontend:
-    image: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest  # Utilise l'image préconstruite du registre
+    image: "${CONTAINER_REGISTRY_ENDPOINT}/frontend:latest"
     ports:
       - "5001:5001"
-    container_name: frontend_app
-    restart: always  # Redémarre le conteneur automatiquement en cas de problème
+    environment:
+      - ENV_VAR=production
 
   backend:
-    image: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest  # Utilise l'image préconstruite du registre
+    image: "${CONTAINER_REGISTRY_ENDPOINT}/backend:latest"
     ports:
       - "5000:5000"
-    container_name: backend_app
-    restart: always  # Redémarre le conteneur automatiquement en cas de problème
+    environment:
+      - ENV_VAR=production
