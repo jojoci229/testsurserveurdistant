@@ -2,32 +2,34 @@ name: CI and Deployment Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]  # Exécute le workflow pour chaque push sur la branche "main"
 
 jobs:
   # Job 1: Construction des images Docker
   build:
     runs-on: ubuntu-latest
     steps:
+      # Étape 1: Récupérer le code du repository GitHub
       - uses: actions/checkout@v4
 
+      # Étape 2: Connexion au registre de conteneurs Scaleway
       - name: Login to Scaleway Container Registry
         uses: docker/login-action@v3
         with:
           username: nologin
-          password: ${{ secrets.SCALEWAY_API_KEY }}
+          password: ${{ secrets.SCALEWAY_API_KEY }}  # Utilise la clé API stockée en secret
           registry: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}
 
+      # Étape 3: Construction et push de l'image frontend
       - name: Build frontend Docker image
-        run: docker build /home/Jaures -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
-
+        run: docker build ./frontend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
 
       - name: Push frontend Docker image
         run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
 
+      # Étape 4: Construction et push de l'image backend
       - name: Build backend Docker image
-        run: docker build /home/Jaures -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
-
+        run: docker build ./backend -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
 
       - name: Push backend Docker image
         run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
@@ -56,11 +58,8 @@ jobs:
           username: ${{ secrets.DEPLOYMENT_USER }}
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
           script: |
-            echo "Déploiement des services sur le serveur distant..."
-            cd /home/Jaures
-            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/frontend:latest
-            docker pull ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/backend:latest
-            
-            # Arrête les anciens conteneurs et redémarre avec les nouvelles images
-            docker-compose -f /home/Jaures/docker-compose.yml down || true
-            docker-compose -f /home/Jaures/docker-compose.yml up -d
+            echo "Pulling images and deploying services..."
+            cd /home/${{ secrets.DEPLOYMENT_USER }}/Jaures
+            docker-compose pull  # Télécharge les dernières images Docker du registre
+            docker-compose down || true  # Arrête les anciens conteneurs s'ils existent
+            docker-compose up -d  # Démarre les nouveaux conteneurs en arrière-plan
