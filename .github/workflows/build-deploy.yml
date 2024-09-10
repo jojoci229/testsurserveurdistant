@@ -59,7 +59,7 @@ jobs:
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
           script: |
             echo "Pulling images and deploying services..."
-            cd /home/${{ secrets.DEPLOYMENT_USER }}/Jaures
+            cd /home/Jaures
             docker-compose pull  # Télécharge les dernières images Docker du registre
             docker-compose down || true  # Arrête les anciens conteneurs s'ils existent
             docker-compose up -d  # Démarre les nouveaux conteneurs en arrière-plan
