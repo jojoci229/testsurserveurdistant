@@ -46,8 +46,8 @@ jobs:
           host: ${{ secrets.DEPLOYMENT_SERVER_IP }}  # Adresse IP du serveur distant
           username: ${{ secrets.DEPLOYMENT_USER }}  # Nom d'utilisateur du serveur
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH privée pour l'authentification
-          source: ./docker-compose.yml  # Fichier docker-compose.yml à la racine du projet
-          target: /home/${{ secrets.DEPLOYMENT_USER }}/Jaures/docker-compose.yml  # Chemin du fichier sur le serveur distant
+          source: './docker-compose.yml'  # Fichier docker-compose.yml à la racine du projet
+          target: '/home/${{ secrets.DEPLOYMENT_USER }}/Jaures/'  # Chemin du fichier sur le serveur distant
 
       # Étape 2: Connexion et déploiement avec Docker Compose
       - name: Deploy to remote server
