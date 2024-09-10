@@ -41,14 +41,15 @@ jobs:
     steps:
       # Étape 1: Transférer le fichier docker-compose.yml vers le serveur distant
       - name: Transfer docker-compose.yml to remote server
-        uses: appleboy/scp-action@v0.1.4  # Utilise l'action SCP pour transférer des fichiers via SSH
+        uses: appleboy/scp-action@v0.1.7  # Version à jour de l'action SCP
         with:
           host: ${{ secrets.DEPLOYMENT_SERVER_IP }}  # Adresse IP du serveur distant
-          username: ${{ secrets.DEPLOYMENT_USER }}  # Nom d'utilisateur du serveur
-          key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH privée pour l'authentification
-          source: "./docker-compose.yml"
-          target: "/home/jaures"
-
+          username: ${{ secrets.DEPLOYMENT_USER }}  # Nom d'utilisateur pour SSH
+          key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH pour l'authentification
+          source: "./docker-compose.yml"  # Chemin du fichier local
+          target: "/home/Jaures/docker-compose.yml"  # Chemin sur le serveur distant
+          strip_components: 0  # Conserve l'arborescence d'origine
+          debug: true  # Active les logs pour voir plus d'informations sur l'erreur
 
       # Étape 2: Connexion et déploiement avec Docker Compose
       - name: Deploy to remote server
@@ -59,7 +60,7 @@ jobs:
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}  # Clé SSH pour l'authentification
           script: |
             echo "Pulling images and deploying services..."
-            cd /home/jaures
+            cd /home/Jaures
             docker-compose pull  # Télécharge les dernières images Docker du registre
             docker-compose down || true  # Arrête les anciens conteneurs s'ils existent
             docker-compose up -d  # Démarre les nouveaux conteneurs en arrière-plan
