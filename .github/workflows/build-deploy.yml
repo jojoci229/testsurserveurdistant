@@ -41,8 +41,8 @@ jobs:
           host: ${{ secrets.DEPLOYMENT_SERVER_IP }}
           username: ${{ secrets.DEPLOYMENT_USER }}
           key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
-          source: ./docker-compose.yml  # Spécifie le fichier à la racine du dépôt
-          target: ~/Jaures/docker-compose.yml  # Transfert vers le répertoire "jaures" sur le serveur distant
+          source: "./docker-compose.yml"  # Spécifie le fichier à la racine du dépôt
+          target: "/home/Jaures"  # Transfert vers le répertoire "jaures" sur le serveur distant
 
       - name: Deploy to remote server
         uses: appleboy/ssh-action@v0.1.6
