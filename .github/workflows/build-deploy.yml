@@ -18,7 +18,7 @@ jobs:
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-private-key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
 
     # Étape 3: (Facultatif) Installer Docker et Docker Compose (si nécessaire)
     - name: Install Docker Compose
@@ -45,7 +45,7 @@ jobs:
     # Étape 6: Déployer avec Docker Compose
     - name: Deploy using Docker Compose
       run: |
-        ssh user@${{ secrets.SERVER_IP }} "
+        ssh user@${{ secrets.DEPLOYMENT_SERVER_IP }} "
           cd /home/user &&
           docker-compose down &&
           docker-compose pull &&
