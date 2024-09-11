@@ -45,7 +45,7 @@ jobs:
     # Étape 5: Transférer le fichier Docker Compose et autres fichiers nécessaires sur le serveur
     - name: Transfer Docker Compose files to server
       run: |
-        scp -o StrictHostKeyChecking=no ./docker-compose.yml root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no docker-compose.yml root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
         scp -o StrictHostKeyChecking=no -r dags/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
         scp -o StrictHostKeyChecking=no -r plugins/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
         scp -o StrictHostKeyChecking=no -r config/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
