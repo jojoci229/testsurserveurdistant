@@ -37,10 +37,10 @@ jobs:
     # Étape 5: Transférer le fichier Docker Compose et autres fichiers nécessaires sur le serveur
     - name: Transfer Docker Compose files to server
       run: |
-        scp -o StrictHostKeyChecking=no docker-compose.yml user@${{ secrets.SERVER_IP }}:/home/user/
-        scp -o StrictHostKeyChecking=no -r dags/ user@${{ secrets.SERVER_IP }}:/home/user/
-        scp -o StrictHostKeyChecking=no -r plugins/ user@${{ secrets.SERVER_IP }}:/home/user/
-        scp -o StrictHostKeyChecking=no -r config/ user@${{ secrets.SERVER_IP }}:/home/user/
+        scp -o StrictHostKeyChecking=no docker-compose.yml root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r dags/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r plugins/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r config/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
 
     # Étape 6: Déployer avec Docker Compose
     - name: Deploy using Docker Compose
@@ -55,7 +55,7 @@ jobs:
     # (Facultatif) Étape 7: Vérification du statut des services
     - name: Check service status
       run: |
-        ssh user@${{ secrets.SERVER_IP }} "
+        ssh root@${{ secrets.DEPLOYMENT_SERVER_IP }} "
           docker ps &&
           docker-compose logs
         "
