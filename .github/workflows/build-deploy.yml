@@ -41,7 +41,7 @@ jobs:
     # Étape 4: Créer le répertoire distant si nécessaire
     - name: Create remote directory if not exists
       run: |
-        ssh -o StrictHostKeyChecking=no root@*** "mkdir -p /home/Jaures/"
+        ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOYMENT_SERVER_IP }} "mkdir -p /home/Jaures/"
     # Étape 5: Transférer le fichier Docker Compose et autres fichiers nécessaires sur le serveur
     - name: Transfer Docker Compose files to server
       run: |
@@ -53,7 +53,7 @@ jobs:
     # Étape 6: Déployer avec Docker Compose
     - name: Deploy using Docker Compose
       run: |
-        ssh user@${{ secrets.DEPLOYMENT_SERVER_IP }} "
+        ssh root@${{ secrets.DEPLOYMENT_SERVER_IP }} "
           cd /home/user &&
           docker-compose down &&
           docker-compose pull &&
