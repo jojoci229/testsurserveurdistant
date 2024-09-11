@@ -46,6 +46,10 @@ jobs:
     - name: Copy project folder to server
       run: |
         scp -r -o StrictHostKeyChecking=no * root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no docker-compose.yml root@${{ secrets.SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r dags/ root@${{ secrets.SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r plugins/ root@${{ secrets.SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r config/ root@${{ secrets.SERVER_IP }}:/home/Jaures/
 
     # Étape 6: Déployer avec Docker Compose
     - name: Deploy using Docker Compose
