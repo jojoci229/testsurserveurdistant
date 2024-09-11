@@ -52,7 +52,7 @@ jobs:
     - name: Deploy using Docker Compose
       run: |
         ssh root@${{ secrets.DEPLOYMENT_SERVER_IP }} "
-          cd /home/Jaures &&
+          cd Jaures &&
           docker-compose down &&
           docker-compose pull &&
           docker-compose up -d --build
