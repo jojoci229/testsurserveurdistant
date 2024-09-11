@@ -45,7 +45,7 @@ jobs:
     # Étape 5: Transférer le fichier Docker Compose et autres fichiers nécessaires sur le serveur
     - name: Copy project folder to server
       run: |
-        rsync -avz --progress /testsurserveurdistant root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/Jaures/
+        rsync -avz --progress * root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/Jaures/
 
 
     # Étape 6: Déployer avec Docker Compose
