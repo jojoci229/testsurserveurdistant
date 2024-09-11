@@ -1,0 +1,67 @@
+name: Continuous Deployment to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Étape 1: Télécharger le code depuis GitHub
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Étape 2: Vérifier que le fichier docker-compose.yml existe
+    - name: List files
+      run: ls -al
+
+    # Étape 2: Configurer SSH pour se connecter au serveur distant
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
+
+    # Étape 3: (Facultatif) Installer Docker et Docker Compose (si nécessaire)
+    - name: Install Docker Compose
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    # Étape 4: Construire et pusher les images si nécessaire
+    - name: Build and push custom Airflow image
+      if: contains(github.event.head_commit.message, 'Dockerfile') || contains(github.event.head_commit.message, 'requirements.txt')
+      run: |
+        docker build -t my-registry/airflow-custom:latest .
+        docker push my-registry/airflow-custom:latest
+    
+    # Étape 4: Créer le répertoire distant si nécessaire
+    - name: Create remote directory if not exists
+      run: |
+        ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOYMENT_SERVER_IP }} "mkdir -p /Jaures/"
+    # Étape 5: Transférer le fichier Docker Compose et autres fichiers nécessaires sur le serveur
+    - name: Copy project folder to server
+      run: |
+        rsync -avz --progress /testsurserveurdistant root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/Jaures/
+
+
+    # Étape 6: Déployer avec Docker Compose
+    - name: Deploy using Docker Compose
+      run: |
+        ssh root@${{ secrets.DEPLOYMENT_SERVER_IP }} "
+          cd Jaures &&
+          docker-compose down &&
+          docker-compose pull &&
+          docker-compose up -d --build
+        "
+
+    # (Facultatif) Étape 7: Vérification du statut des services
+    - name: Check service status
+      run: |
+        ssh root@${{ secrets.DEPLOYMENT_SERVER_IP }} "
+          docker ps &&
+          docker-compose logs
+        "
