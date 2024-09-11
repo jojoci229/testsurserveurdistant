@@ -14,6 +14,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    # Étape 2: Vérifier que le fichier docker-compose.yml existe
+    - name: List files
+      run: ls -al
+
     # Étape 2: Configurer SSH pour se connecter au serveur distant
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
@@ -33,14 +37,18 @@ jobs:
       run: |
         docker build -t my-registry/airflow-custom:latest .
         docker push my-registry/airflow-custom:latest
-
+    
+    # Étape 4: Créer le répertoire distant si nécessaire
+    - name: Create remote directory if not exists
+      run: |
+        ssh -o StrictHostKeyChecking=no root@*** "mkdir -p /home/root/"
     # Étape 5: Transférer le fichier Docker Compose et autres fichiers nécessaires sur le serveur
     - name: Transfer Docker Compose files to server
       run: |
-        scp -o StrictHostKeyChecking=no docker-compose.yml root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/root/
-        scp -o StrictHostKeyChecking=no -r dags/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/root/
-        scp -o StrictHostKeyChecking=no -r plugins/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/root/
-        scp -o StrictHostKeyChecking=no -r config/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/root/
+        scp -o StrictHostKeyChecking=no ./docker-compose.yml root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r dags/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r plugins/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
+        scp -o StrictHostKeyChecking=no -r config/ root@${{ secrets.DEPLOYMENT_SERVER_IP }}:/home/Jaures/
 
     # Étape 6: Déployer avec Docker Compose
     - name: Deploy using Docker Compose
